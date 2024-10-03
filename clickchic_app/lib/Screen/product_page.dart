@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:clickchic_app/Screen/Cart-page.dart';
 import 'package:clickchic_app/Screen/detail_page.dart';
 import 'package:clickchic_app/Screen/notification_page.dart';
 import 'package:clickchic_app/Screen/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductPage extends StatefulWidget {
   ProductPage({Key? key, required this.title}) : super(key: key);
@@ -17,6 +19,25 @@ class ProductPage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<ProductPage> {
+  String username = ''; // To hold the user's name
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Load user data when the page is initialized
+  }
+
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userJson = prefs.getString('user');
+    if (userJson != null) {
+      Map<String, dynamic> user = json.decode(userJson);
+      setState(() {
+        username = user['username']; // Extract and set the username
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +91,7 @@ class _MyHomePageState extends State<ProductPage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
-                  'MAHITH',
+                  username.isNotEmpty ? username.toUpperCase() : 'GUEST',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

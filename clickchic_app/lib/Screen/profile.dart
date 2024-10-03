@@ -1,31 +1,44 @@
-// ignore_for_file: deprecated_member_use
-
+import 'dart:convert';
 import 'package:clickchic_app/Screen/Cart-page.dart';
+import 'package:clickchic_app/Screen/account.dart';
 import 'package:clickchic_app/Screen/loging.dart';
 import 'package:clickchic_app/Screen/notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:clickchic_app/Screen/product_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  // Function to fetch user data
+  Future<Map<String, dynamic>> getUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userJson = prefs.getString('user');
+
+    if (userJson != null) {
+      return json.decode(userJson);
+    }
+
+    return {};
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ProductPage(
-                          title: '',
-                        )));
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductPage(title: ''),
+              ),
+            );
           },
         ),
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Profile',
           style: TextStyle(
             color: Colors.black,
@@ -34,114 +47,156 @@ class ProfileScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_active),
+            icon: const Icon(Icons.notifications_active),
             onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationPage()),
+              );
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(1),
-                width: 150,
-                child: const CircleAvatar(
-                  radius: 60,
-                  backgroundImage: AssetImage('assets/profile.jpg'),
-                ),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.black.withOpacity(.5),
-                    width: 2.0,
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: getUserData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No user data available'));
+          }
+
+          var user = snapshot.data!;
+          var username = user['username'] ?? 'Username';
+          var email = user['email'] ?? 'Email';
+
+          return SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Profile Picture
+                  Container(
+                    padding: const EdgeInsets.all(1),
+                    width: 150,
+                    child: const CircleAvatar(
+                      radius: 60,
+                      backgroundImage: AssetImage('assets/profile.jpg'),
+                    ),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.black.withOpacity(.5),
+                        width: 2.0,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+
+                  // Username and Email centered
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Text(
+                          username,
+                          textAlign: TextAlign.center, // Center text
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis, // Handle long names
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        email,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30.0),
+
+                  // Account Options
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: const Text('Account'),
+                          leading: const Icon(Icons.person),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AccountScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const ListTile(
+                          title: Text('Settings'),
+                          leading: Icon(Icons.settings),
+                          trailing: Icon(Icons.arrow_forward_ios),
+                        ),
+                        const ListTile(
+                          title: Text('Notification'),
+                          leading: Icon(Icons.notifications_active),
+                          trailing: Icon(Icons.arrow_forward_ios),
+                        ),
+                        const ListTile(
+                          title: Text('Help'),
+                          leading: Icon(Icons.help),
+                          trailing: Icon(Icons.arrow_forward_ios),
+                        ),
+                        const ListTile(
+                          title: Text('Share'),
+                          leading: Icon(Icons.share),
+                          trailing: Icon(Icons.arrow_forward_ios),
+                        ),
+                        ListTile(
+                          title: const Text('Logout'),
+                          leading: const Icon(Icons.logout),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 150,
-                child: Row(
-                  children: [
-                    Text(
-                      'Mahith Sheshan',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                'Mahith1@icloud.com',
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-              SizedBox(height: 30.0),
-              Container(
-                padding: const EdgeInsets.all(10),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Text('Account'),
-                      leading: Icon(Icons.person),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                    ),
-                    ListTile(
-                      title: Text('Settings'),
-                      leading: Icon(Icons.settings),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                    ),
-                    ListTile(
-                      title: Text('Notification'),
-                      leading: Icon(Icons.notifications_active),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                    ),
-                    ListTile(
-                      title: Text('Help'),
-                      leading: Icon(Icons.help),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                    ),
-                    ListTile(
-                      title: Text('Share'),
-                      leading: Icon(Icons.share),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                    ),
-                    ListTile(
-                      title: Text('Logout'),
-                      leading: Icon(Icons.logout),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginScreen()));
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          // ignore: deprecated_member_use
           color: Theme.of(context).bottomAppBarColor,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),
             topRight: Radius.circular(30),
           ),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black38,
               spreadRadius: 0,
@@ -150,7 +205,7 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),
             topRight: Radius.circular(30),
           ),
@@ -162,25 +217,33 @@ class ProfileScreen extends StatelessWidget {
               switch (index) {
                 case 0:
                   Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProductPage(
-                                title: 'Home',
-                              )));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductPage(title: 'Home'),
+                    ),
+                  );
                   break;
                 case 1:
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => CartPage()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartPage()),
+                  );
                   break;
                 case 2:
                   Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NotificationPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationPage(),
+                    ),
+                  );
                   break;
                 case 3:
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => ProfileScreen()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  );
                   break;
               }
             },
