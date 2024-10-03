@@ -6,6 +6,7 @@ import 'package:clickchic_app/Screen/Cart-page.dart';
 import 'package:clickchic_app/Screen/detail_page.dart';
 import 'package:clickchic_app/Screen/notification_page.dart';
 import 'package:clickchic_app/Screen/profile.dart';
+import 'package:clickchic_app/Services/battery.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
@@ -138,18 +139,22 @@ class _MyHomePageState extends State<ProductPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text(
-                  'WELCOME',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween, // Align to sides
+                children: [
+                  Text(
+                    'WELCOME',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
+                  BatteryStatusWidget(), // Battery widget aligned to the right
+                ],
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: 16, top: 8),
                 child: Row(
                   mainAxisAlignment:
                       MainAxisAlignment.spaceBetween, // Align username and city
