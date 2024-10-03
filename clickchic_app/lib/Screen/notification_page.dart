@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:clickchic_app/Screen/Cart-page.dart';
 import 'package:clickchic_app/Screen/product_page.dart';
 import 'package:clickchic_app/Screen/profile.dart';
 import 'package:flutter/material.dart';
@@ -158,12 +159,8 @@ class _NotificationPageState extends State<NotificationPage> {
                               )));
                   break;
                 case 1:
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProductPage(
-                                title: 'Home',
-                              )));
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => CartPage()));
                   break;
                 case 2:
                   Navigator.pushReplacement(

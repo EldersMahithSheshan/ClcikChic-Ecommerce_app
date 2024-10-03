@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:clickchic_app/Screen/Success_screen.dart';
 import 'package:clickchic_app/Screen/product_page.dart';
 
 import 'package:clickchic_app/Screen/signup.dart';

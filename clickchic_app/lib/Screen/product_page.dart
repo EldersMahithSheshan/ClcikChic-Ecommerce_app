@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:clickchic_app/Screen/Cart-page.dart';
 import 'package:clickchic_app/Screen/detail_page.dart';
 import 'package:clickchic_app/Screen/notification_page.dart';
 import 'package:clickchic_app/Screen/profile.dart';
@@ -328,12 +329,8 @@ class _MyHomePageState extends State<ProductPage> {
                               )));
                   break;
                 case 1:
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProductPage(
-                                title: 'Home',
-                              )));
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => CartPage()));
                   break;
                 case 2:
                   Navigator.pushReplacement(

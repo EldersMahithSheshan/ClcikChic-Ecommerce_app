@@ -1,4 +1,7 @@
+// ignore_for_file: unused_import
+
 import 'package:clickchic_app/Onboarding/splash.dart';
+import 'package:clickchic_app/Screen/product_page.dart';
 import 'package:clickchic_app/theme/dark_theme.dart';
 import 'package:clickchic_app/theme/light_theme.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +19,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,
-      home: splash(),
+      home: ProductPage(
+        title: 'Custoemr',
+      ),
     );
   }
 }
