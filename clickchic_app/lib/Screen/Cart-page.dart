@@ -25,7 +25,7 @@ class CartPage extends StatelessWidget {
             );
           },
         ),
-        title: const Text('Cart'),
+        title: Center(child: const Text('Cart')),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),

@@ -8,6 +8,8 @@ import 'package:clickchic_app/Screen/notification_page.dart';
 import 'package:clickchic_app/Screen/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class ProductPage extends StatefulWidget {
   ProductPage({Key? key, required this.title}) : super(key: key);
@@ -20,11 +22,13 @@ class ProductPage extends StatefulWidget {
 
 class _MyHomePageState extends State<ProductPage> {
   String username = ''; // To hold the user's name
+  String _city = 'Fetching location...'; // Default to show while fetching city
 
   @override
   void initState() {
     super.initState();
     _loadUserData(); // Load user data when the page is initialized
+    _getCurrentLocation(); // Fetch the current location
   }
 
   Future<void> _loadUserData() async {
@@ -34,6 +38,62 @@ class _MyHomePageState extends State<ProductPage> {
       Map<String, dynamic> user = json.decode(userJson);
       setState(() {
         username = user['username']; // Extract and set the username
+      });
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _city = "Location services are disabled";
+      });
+      return;
+    }
+
+    // Check for location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          _city = "Location permission is denied";
+        });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        _city = "Location permission is permanently denied";
+      });
+      return;
+    }
+
+    // Get the current position if permission is granted
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Use reverse geocoding to get the city from coordinates
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      // Update the city in UI
+      setState(() {
+        _city = placemarks[0].locality ?? "Unknown city";
+      });
+    } catch (e) {
+      // Handle error in case of geolocation issues
+      setState(() {
+        _city = "Error fetching location";
       });
     }
   }
@@ -90,13 +150,33 @@ class _MyHomePageState extends State<ProductPage> {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  username.isNotEmpty ? username.toUpperCase() : 'GUEST',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[600],
-                  ),
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween, // Align username and city
+                  children: [
+                    Text(
+                      username.isNotEmpty ? username.toUpperCase() : 'GUEST',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on,
+                            color: Theme.of(context).colorScheme.onPrimary),
+                        SizedBox(width: 5),
+                        Text(
+                          _city,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Roboto',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               Container(

@@ -1,14 +1,25 @@
 import 'dart:convert';
+import 'dart:io'; // Import for File
 import 'package:clickchic_app/Screen/Cart-page.dart';
 import 'package:clickchic_app/Screen/account.dart';
 import 'package:clickchic_app/Screen/loging.dart';
 import 'package:clickchic_app/Screen/notification_page.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Import for Image Picker
 import 'package:clickchic_app/Screen/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart'; // Import for permissions
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
 
   // Function to fetch user data
   Future<Map<String, dynamic>> getUserData() async {
@@ -20,6 +31,129 @@ class ProfileScreen extends StatelessWidget {
     }
 
     return {};
+  }
+
+  // Save the image path in SharedPreferences
+  Future<void> saveImagePath(String path) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('profile_image_path', path);
+  }
+
+  // Load the image path from SharedPreferences
+  Future<void> loadImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? imagePath = prefs.getString('profile_image_path');
+    setState(() {
+      if (imagePath != null) {
+        _imageFile = File(imagePath);
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Load the saved image when the profile screen initializes
+    loadImage();
+  }
+
+  // Function to handle photo selection
+  Future<void> takePhoto(ImageSource source) async {
+    final permissionStatus = await _checkPermission(source);
+
+    if (permissionStatus) {
+      final pickedFile = await _picker.pickImage(source: source);
+      setState(() {
+        _imageFile = pickedFile != null ? File(pickedFile.path) : null;
+      });
+
+      // Save the picked image path to SharedPreferences
+      if (_imageFile != null) {
+        await saveImagePath(_imageFile!.path);
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permission denied')),
+      );
+    }
+  }
+
+  // Check for camera and gallery permissions
+  Future<bool> _checkPermission(ImageSource source) async {
+    if (source == ImageSource.camera) {
+      var status = await Permission.camera.request();
+      return status == PermissionStatus.granted;
+    } else {
+      var status = await Permission.photos.request();
+      return status == PermissionStatus.granted;
+    }
+  }
+
+  Widget bottomSheet() {
+    return Container(
+      height: 100.0,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text(
+            "Choose Profile photo",
+            style: TextStyle(fontSize: 20.0),
+          ),
+          const SizedBox(height: 20),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            TextButton.icon(
+              icon: const Icon(Icons.camera),
+              onPressed: () {
+                takePhoto(ImageSource.camera);
+                Navigator.pop(context); // Close the bottom sheet
+              },
+              label: const Text("Camera"),
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.image),
+              onPressed: () {
+                takePhoto(ImageSource.gallery);
+                Navigator.pop(context); // Close the bottom sheet
+              },
+              label: const Text("Gallery"),
+            ),
+          ])
+        ],
+      ),
+    );
+  }
+
+  Widget imageProfile() {
+    return Center(
+      child: Stack(
+        children: <Widget>[
+          CircleAvatar(
+            radius: 80.0,
+            backgroundImage: _imageFile == null
+                ? const AssetImage("assets/profile.jpg") as ImageProvider
+                : FileImage(_imageFile!),
+          ),
+          Positioned(
+            bottom: 20.0,
+            right: 20.0,
+            child: InkWell(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: ((builder) => bottomSheet()),
+                );
+              },
+              child: const Icon(
+                Icons.camera_alt,
+                color: Colors.teal,
+                size: 28.0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -40,10 +174,7 @@ class ProfileScreen extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-          ),
+          style: TextStyle(fontSize: 20),
         ),
         actions: [
           IconButton(
@@ -79,22 +210,8 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Profile Picture
-                  Container(
-                    padding: const EdgeInsets.all(1),
-                    width: 150,
-                    child: const CircleAvatar(
-                      radius: 60,
-                      backgroundImage: AssetImage('assets/profile.jpg'),
-                    ),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.black.withOpacity(.5),
-                        width: 2.0,
-                      ),
-                    ),
-                  ),
+                  // Profile Picture with option to change
+                  imageProfile(),
                   const SizedBox(height: 20),
 
                   // Username and Email centered
@@ -104,12 +221,12 @@ class ProfileScreen extends StatelessWidget {
                       Center(
                         child: Text(
                           username,
-                          textAlign: TextAlign.center, // Center text
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
-                          overflow: TextOverflow.ellipsis, // Handle long names
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -190,7 +307,6 @@ class ProfileScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          // ignore: deprecated_member_use
           color: Theme.of(context).bottomAppBarColor,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),
@@ -226,7 +342,9 @@ class ProfileScreen extends StatelessWidget {
                 case 1:
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const CartPage()),
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(),
+                    ),
                   );
                   break;
                 case 2:
@@ -247,7 +365,7 @@ class ProfileScreen extends StatelessWidget {
                   break;
               }
             },
-            destinations: const [
+            destinations: const <Widget>[
               NavigationDestination(
                 icon: Icon(Icons.home),
                 label: 'Home',
@@ -261,7 +379,7 @@ class ProfileScreen extends StatelessWidget {
                 label: 'Notification',
               ),
               NavigationDestination(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.account_circle),
                 label: 'Profile',
               ),
             ],
