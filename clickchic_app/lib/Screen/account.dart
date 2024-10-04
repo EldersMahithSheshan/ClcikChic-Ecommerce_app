@@ -103,7 +103,10 @@ class _AccountScreenState extends State<AccountScreen> {
                   const Divider(thickness: 1),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    child: const Text('Edit Details'),
+                    child: const Text(
+                      'Edit Details',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,

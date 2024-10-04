@@ -3,7 +3,7 @@ import 'package:clickchic_app/Screen/profile.dart';
 import 'package:clickchic_app/Services/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'product_page.dart'; // Import your product page
+import 'product_page.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({Key? key}) : super(key: key);
@@ -15,9 +15,8 @@ class CartPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Back icon
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Navigate back to the ProductPage
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -25,7 +24,7 @@ class CartPage extends StatelessWidget {
             );
           },
         ),
-        title: Center(child: const Text('Cart')),
+        title: const Center(child: Text('Cart')),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -36,8 +35,15 @@ class CartPage extends StatelessWidget {
         ],
       ),
       body: cartProvider.cartItems.isEmpty
-          ? const Center(
-              child: Text('Your cart is empty', style: TextStyle(fontSize: 18)),
+          ? Center(
+              child: Text(
+                'Your cart is empty',
+                style: TextStyle(
+                  fontSize: 18,
+                  color:
+                      Theme.of(context).colorScheme.onSurface, // Themed color
+                ),
+              ),
             )
           : Padding(
               padding: const EdgeInsets.all(16.0),
@@ -50,6 +56,9 @@ class CartPage extends StatelessWidget {
                         final item = cartProvider.cartItems[index];
                         return Card(
                           margin: const EdgeInsets.only(bottom: 16),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceVariant, // Themed card background
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Row(
@@ -63,13 +72,31 @@ class CartPage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(item['title'],
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16)),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface, // Themed text color
+                                          )),
                                       const SizedBox(height: 4),
-                                      Text(item['subtitle']),
+                                      Text(
+                                        item['subtitle'],
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant, // Themed subtitle color
+                                        ),
+                                      ),
                                       const SizedBox(height: 8),
-                                      Text('Rs. ${item['price']}'),
+                                      Text(
+                                        'Rs. ${item['price']}',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface, // Themed price text
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -78,20 +105,36 @@ class CartPage extends StatelessWidget {
                                     Row(
                                       children: [
                                         IconButton(
-                                          icon: const Icon(Icons.remove),
+                                          icon: Icon(Icons.remove,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary), // Themed icon color
                                           onPressed: () => cartProvider
                                               .decrementQuantity(index),
                                         ),
-                                        Text('${item['quantity']}'),
+                                        Text(
+                                          '${item['quantity']}',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface, // Themed text color
+                                          ),
+                                        ),
                                         IconButton(
-                                          icon: const Icon(Icons.add),
+                                          icon: Icon(Icons.add,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary), // Themed icon color
                                           onPressed: () => cartProvider
                                               .incrementQuantity(index),
                                         ),
                                       ],
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete),
+                                      icon: Icon(Icons.delete,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error), // Themed delete icon
                                       onPressed: () =>
                                           cartProvider.removeItem(index),
                                     ),
@@ -105,12 +148,26 @@ class CartPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text('Total Items: ${cartProvider.totalItems}',
-                      style: const TextStyle(fontSize: 18)),
+                  Text(
+                    'Total Items: ${cartProvider.totalItems}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface, // Themed text
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  Text('Total: Rs. ${cartProvider.totalPrice}',
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Total: Rs. ${cartProvider.totalPrice}',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface, // Themed text
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -119,8 +176,10 @@ class CartPage extends StatelessWidget {
                       onPressed: () {
                         // Proceed to checkout logic
                       },
-                      child: const Text('Proceed to Payment',
-                          style: TextStyle(fontSize: 18)),
+                      child: const Text(
+                        'Proceed to Payment',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
                 ],
@@ -128,9 +187,8 @@ class CartPage extends StatelessWidget {
             ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          // ignore: deprecated_member_use
           color: Theme.of(context).bottomAppBarColor,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),
             topRight: Radius.circular(30),
           ),
@@ -143,7 +201,7 @@ class CartPage extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),
             topRight: Radius.circular(30),
           ),
@@ -157,9 +215,7 @@ class CartPage extends StatelessWidget {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ProductPage(
-                                title: 'Home',
-                              )));
+                          builder: (context) => ProductPage(title: 'Home')));
                   break;
                 case 1:
                   Navigator.pushReplacement(context,

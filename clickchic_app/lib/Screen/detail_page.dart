@@ -322,7 +322,11 @@ class DetailPage extends StatelessWidget {
                           'quantity': 1,
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Added to Cart!')),
+                          const SnackBar(
+                              content: Text('Added to Cart!',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  ))),
                         );
                       },
                       child: const Text(
