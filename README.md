@@ -51,14 +51,16 @@ The app dynamically switches between dark and light modes to enhance user comfor
 - **Light Theme**: Standard UI with light background and dark text.
 - **Dark Theme**: Optimized for low-light environments with a dark background and light text.
 
-### Screenshots Comparison:
-- **Product Page**: 
-  - ![Light Theme](path-to-light-theme-screenshot)
-  - ![Dark Theme](path-to-dark-theme-screenshot)
-  
-- **Cart Page**: 
-  - ![Light Theme](path-to-cart-light-theme-screenshot)
-  - ![Dark Theme](path-to-cart-dark-theme-screenshot)
+### Screenshots:
+
+![Screenshot_1728031435](https://github.com/user-attachments/assets/74b92385-23ba-44df-b522-ad263df762c3)
+![Screenshot_1728033300](https://github.com/user-attachments/assets/0825f346-6a90-4886-b60c-c80a33bce22c)
+![Screenshot_1728026828](https://github.com/user-attachments/assets/0ca11483-5ac3-4a0d-86e5-4814779d4c70)
+![Screenshot_1728026832](https://github.com/user-attachments/assets/4e80b74f-4a28-4baa-895b-4b1fba10e078)
+![Screenshot_1728030142](https://github.com/user-attachments/assets/9be8c1af-f93e-4e2b-8b38-90b206cf5dbb)
+![Screenshot_1728031367](https://github.com/user-attachments/assets/8722f84f-1f1c-482b-8ced-982b1265c931)
+![Screenshot_1728031420](https://github.com/user-attachments/assets/23d8ed02-c089-4d81-b0ab-61a58e1cbbf9)
+![Screenshot_1728031430](https://github.com/user-attachments/assets/197bfdcf-138a-4f76-bad5-7bb0cff5b859)
 
 ## 🧪 Testing & Performance
 
